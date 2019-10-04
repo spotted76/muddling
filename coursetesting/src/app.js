@@ -3,12 +3,44 @@ import React, {useState, useEffect} from 'react'
 import Note from './components/note'
 import noteService from './services/notes'
 
+import './index.css'
+
+//Create a component for displaying an error
+const Notification = ({message}) => {
+  if ( message === null) {
+    return null;
+  }
+
+  return (
+    <div className="error">
+      {message}
+    </div>
+  );
+}
+
+const Footer = () => {
+
+  const footerStyle = {
+    color: 'green',
+    fontStyle: 'italic',
+    fontSize: 16
+  }
+
+  return (
+    <div style={footerStyle}>
+      <br />
+        <em>Note app, Department of Computer Science, University of Helsinki 2019</em>
+    </div>
+  );
+}
+
 //App module
 const App = () => {
 
   const [notes, setNotes] = useState([]);
   const [newNote, setNewNote] = useState("a new note...");
   const [showAll, setShowAll] = useState(true);
+  const [errorMessage, setErrorMessage] = useState(null);
 
    //Use an effect to retrieve json data
   useEffect(() => {
@@ -37,9 +69,11 @@ const App = () => {
           notes.map(note => note.id !== id ? note : returnedNote))
       )
       .catch(error => {
-        alert(`The note ${note.content} was already deleted from the server`);
+        setErrorMessage(`The note ${note.content} was already deleted from the server`);
+        setTimeout(() => {setErrorMessage(null)}, 5000);
+        
         setNotes(notes.filter(note => note.id !== id));
-      })
+      });
   }
 
   //Map each note object to a Note component
@@ -75,6 +109,9 @@ const App = () => {
   return (
     <div>
       <h1>Notes</h1>
+
+      <Notification message={errorMessage} />
+
       <div>
         <button onClick={
           () => setShowAll(!showAll)
@@ -87,6 +124,7 @@ const App = () => {
         <input value = {newNote} onChange={handleNoteChange}/>
         <button type="submit">save</button>
       </form>
+      <Footer />
     </div>
   );
 
