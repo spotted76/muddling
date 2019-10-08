@@ -8,6 +8,7 @@ const app = express();
 //Enable body-parser to pull out jason data
 app.use(bodyParser.json());
 app.use(cors());
+app.use(express.static('build'));
 
 let notes = [
   {
@@ -32,15 +33,15 @@ let notes = [
 
 
 
-app.get('/', (req, res) => {
-  res.send("<h1>Hello World</h1>");
-});
+// app.get('/', (req, res) => {
+//   res.send("<h1>Hello World</h1>");
+// });
 
-app.get('/notes', (req, res) => {
+app.get('/api/notes', (req, res) => {
   res.json(notes);
 });
 
-app.get('/notes/:id', (req, res) => {
+app.get('/api/notes/:id', (req, res) => {
   const id = Number(req.params.id)
   const note = notes.find( note => note.id === id);
   if (note) {
@@ -52,7 +53,7 @@ app.get('/notes/:id', (req, res) => {
   }
 });
 
-app.delete('/notes/:id', (req, res) => {
+app.delete('/api/notes/:id', (req, res) => {
   const id = Number(req.params.id);
   notes = notes.filter(note => note.id != id);
 
@@ -67,7 +68,7 @@ const generateId = () => {
   return MaxId + 1;
 }
 
-app.post('/notes', (req, res) => {
+app.post('/api/notes', (req, res) => {
 
   if ( !req.body.content ) {
     return res.status(400).json({
@@ -86,8 +87,9 @@ app.post('/notes', (req, res) => {
   res.json(note);
 })
 
-const port = 3001;
-app.listen(port, () => {
-  console.log(`server listening on port ${port}`);
+// const port = 3001;
+const PORT = process.env.PORT || 3001;
+app.listen(PORT, () => {
+  console.log(`server listening on port ${PORT}`);
 });
 
