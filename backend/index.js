@@ -34,39 +34,39 @@ app.use(express.static('build'));
 //   }
 // ];
 
-
+//GET - Retrieve all notes
 app.get('/api/notes', (req, res) => {
-  //res.json(notes);
   Note.find({})
     .then(notes => res.send( notes.map(note => note.toJSON())));
 });
 
-app.get('/api/notes/:id', (req, res) => {
+//GET - Retrieve a single note
+app.get('/api/notes/:id', (req, res, next) => {
   
   Note.findById(req.params.id)
     .then(result => {
-      res.send(result.toJSON());
+      if ( result ) {
+        res.send(result.toJSON());
+      }
+      else {
+        res.status(404).end();  
+      }
     })
-    .catch(err => {
-      res.status(404).end();
-    });
+    .catch(err => next(err));
 }); // /api/notes/:id
 
-app.delete('/api/notes/:id', (req, res) => {
-  const id = Number(req.params.id);
-  notes = notes.filter(note => note.id != id);
+//DELETE - Delete a single note
+app.delete('/api/notes/:id', (req, res, next) => {
 
-  res.status(204).end();
+  Note.findByIdAndDelete(req.params.id)
+    .then(result => {
+      res.status(204).end();
+    })
+    .catch(err => next(err));
 });
 
-const generateId = () => {
-  const MaxId = notes.length > 0 
-    ? Math.max(...notes.map(n => n.id))
-    : 0
 
-  return MaxId + 1;
-}
-
+//POST - Create a new note
 app.post('/api/notes', (req, res) => {
 
   if ( !req.body.content ) {
@@ -92,6 +92,41 @@ app.post('/api/notes', (req, res) => {
       console.log("Error occurred saving note to MongDB");
     })
 }); //app.post
+
+//PUT - Modify a note
+app.put('/api/notes/:id', (req, res, next) => {
+
+  //Copy off pertinent data
+  const newObj = {
+   content: req.body.content,
+   important: req.body.important
+  }
+
+  //Update the object based on the id
+  Note.findByIdAndUpdate(req.params.id, newObj, {new:true})
+    .then(result => res.json(result.toJSON()))
+    .catch(err => errorHandler(err));
+
+});
+
+//Setup an unknown endpoint
+const unknownEndpoint = (req, res) => {
+  res.status(404).send({error: "unknown endpoint"});
+}
+app.use(unknownEndpoint);
+
+//Define error handling middleware
+const errorHandler = (error, req, res, next) => {
+  console.log(error.message);
+
+  if ( error.name === "CastError" && error.kind === "ObjectId") {
+    return res.status(400).send({error: "malformed id"})
+  }
+
+  next();
+}
+
+app.use(errorHandler);
 
 // const port = 3001;
 const PORT = process.env.PORT;

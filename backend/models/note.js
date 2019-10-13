@@ -1,5 +1,7 @@
 const mongoose = require('mongoose');
 
+mongoose.set('useFindAndModify', false);
+
 //Establish a connection to the database
 const MONGODB_URI = process.env.MONGDB_URI;
 mongoose.connect(

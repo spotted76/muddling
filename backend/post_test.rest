@@ -1,9 +1,9 @@
 
-POST http://localhost:3001/api/notes/
+PUT http://localhost:3001/api/notes/5da268a84eeb1846d0fb54f3
 content-type: application/json
 
   {
-    "content": "This should post from here",
-    "important": false
+    "content": "!Here's another for testing!",
+    "important": true
   }
 
