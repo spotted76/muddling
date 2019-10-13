@@ -67,13 +67,7 @@ app.delete('/api/notes/:id', (req, res, next) => {
 
 
 //POST - Create a new note
-app.post('/api/notes', (req, res) => {
-
-  if ( !req.body.content ) {
-    return res.status(400).json({
-      error:  'content missing'
-    });
-  }
+app.post('/api/notes', (req, res, next) => {
 
   const note = new Note(
     {
@@ -83,14 +77,11 @@ app.post('/api/notes', (req, res) => {
     }
   );
 
+  //Save off the note
   note.save()
-    .then(result => {
-      //Now send it back to the server
-      res.json(result.toJSON());
-    })
-    .catch(err => {
-      console.log("Error occurred saving note to MongDB");
-    })
+    .then(result => result.toJSON())
+    .then(formattedResult => res.json(formattedResult))
+    .catch(err => next(err));
 }); //app.post
 
 //PUT - Modify a note
@@ -117,10 +108,12 @@ app.use(unknownEndpoint);
 
 //Define error handling middleware
 const errorHandler = (error, req, res, next) => {
-  console.log(error.message);
-
+  
   if ( error.name === "CastError" && error.kind === "ObjectId") {
     return res.status(400).send({error: "malformed id"})
+  }
+  if ( error.name === "ValidationError") {
+    return res.status(400).send({error: error.message});
   }
 
   next();
