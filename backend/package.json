@@ -8,7 +8,8 @@
     "start": "node index.js",
     "watch": "nodemon index.js",
     "build:ui": "cd ../../muddling/coursetesting/ && npm run build --prod",
-    "logs": "heroku logs --tail"
+    "logs": "heroku logs --tail",
+    "lint": "eslint ."
   },
   "keywords": [],
   "author": "",
@@ -19,5 +20,8 @@
     "dotenv": "^8.1.0",
     "express": "^4.17.1",
     "mongoose": "^5.7.4"
+  },
+  "devDependencies": {
+    "eslint": "^6.5.1"
   }
 }
