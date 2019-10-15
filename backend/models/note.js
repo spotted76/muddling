@@ -1,9 +1,6 @@
 const config = require('../utils/config');
 const mongoose = require('mongoose');
 
-mongoose.set('useFindAndModify', false);
-
-
 //Define the schema & model for the Note
 const noteSchema = new mongoose.Schema({
   content: {
