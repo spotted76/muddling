@@ -1,11 +1,11 @@
+const config = require('../utils/config');
 const mongoose = require('mongoose');
 
 mongoose.set('useFindAndModify', false);
 
 //Establish a connection to the database
-const MONGODB_URI = process.env.MONGDB_URI;
 mongoose.connect(
-  MONGODB_URI
+  config.MONGODB_URI
   ,{useNewUrlParser: true, useUnifiedTopology: true})
   .then(result => {
     console.log("connected to MongoDB")
