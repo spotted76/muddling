@@ -4,39 +4,35 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const notesRouter = require('./controllers/notes');
+const middleware = require('./utils/middleware');
+const mongoose = require('mongoose');
 
 const app = express();
+
+
+//Establish a connection to the database
+mongoose.set('useFindAndModify', false);
+mongoose.connect(
+  config.MONGODB_URI
+  ,{ useNewUrlParser: true, useUnifiedTopology: true })
+  .then(result => {
+    console.log('connected to MongoDB');
+  })
+  .catch(err => {
+    console.log(
+      'Error connecting to MongDB');
+  });
 
 //Enable body-parser to pull out jason data
 app.use(bodyParser.json());
 app.use(cors());
 app.use(express.static('build'));
+
+app.use(middleware.requestLogger);
 app.use('/api/notes', notesRouter);
 
-
-
-
-
-//Setup an unknown endpoint
-const unknownEndpoint = (req, res) => {
-  res.status(404).send({error: "unknown endpoint"});
-}
-app.use(unknownEndpoint);
-
-//Define error handling middleware
-const errorHandler = (error, req, res, next) => {
-  
-  if ( error.name === "CastError" && error.kind === "ObjectId") {
-    return res.status(400).send({error: "malformed id"})
-  }
-  if ( error.name === "ValidationError") {
-    return res.status(400).send({error: error.message});
-  }
-
-  next();
-}
-
-app.use(errorHandler);
+app.use(middleware.unknownEndpoint);
+app.use(middleware.errorHandler);
 
 // const port = 3001;
 app.listen(config.PORT, () => {
