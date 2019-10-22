@@ -1,9 +1,9 @@
 
-PUT http://localhost:3001/api/notes
+POST http://localhost:3001/api/notes
 content-type: application/json
 
   {
-    "content": "Test with this object!!",
+    "content": "HTML is Easy",
     "important": false
   }
 
