@@ -2,6 +2,13 @@
 import axios from 'axios'
 const baseUrl = '/api/notes';
 
+
+let token = null;
+const setToken = (newToken) => {
+  token = `bearer ${newToken}`;
+};
+
+
 const getAll = () => {
   const request = axios.get(baseUrl);
   // return request.then(response => response.data);
@@ -15,7 +22,14 @@ const getAll = () => {
 }
 
 const create = newObject => {
-  const request = axios.post(baseUrl, newObject);
+
+  const config = {
+    headers: {
+      Authorization : token
+    }
+  };
+
+  const request = axios.post(baseUrl, newObject, config);
   return request.then(response => response.data);
 }
 
@@ -25,4 +39,4 @@ const update = (id, newObject) => {
 }
 
 
-export default {getAll,create,update}
+export default {getAll,create,update, setToken}
